@@ -27,6 +27,7 @@ SC_MODULE(SysBias)
   Connections::In<spec::SysConfig>   sys_config;
   Connections::In<spec::InputType>   weight_in;
   Connections::In<spec::AccumType>   accum_out;
+  Connections::In<spec::InputType>   act_in_vec[N];
   Connections::Out<spec::InputType>  act_out;
 
   SC_HAS_PROCESS(SysBias);

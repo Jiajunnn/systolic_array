@@ -26,4 +26,4 @@ sim_test: $(wildcard *.h) $(wildcard *.cpp)
 	$(CC) -o sim_test $(CFLAGS) $(USER_FLAGS) $(wildcard *.cpp) $(BOOSTLIBS) $(LIBS)
 
 sim_clean:
-	rm -rf *.o sim_*
+	rm -rf *.o sim_* *.log

@@ -17,16 +17,17 @@
 TOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST)))../)
 ROOT ?= $(TOT)
 
-# Location of submodules
-CONNECTIONS_HOME ?= $(ROOT)/matchlib/connections
-RAPIDJSON_HOME ?= $(ROOT)/matchlib/rapidjson
-MATCHLIB_HOME ?= $(ROOT)/matchlib/cmod
 
 
 # PLEASE SET BOOST_HOME, SYSTEMC_HOME, CATAPULT_HOME to correct path 
-BOOST_HOME ?= 
-SYSTEMC_HOME ?=
-CATAPULT_HOME ?= 
+BOOST_HOME ?= /sim/ttambe/hls_work/boost_out/boost
+CATAPULT_HOME ?= /cad/mentor/2024.2/
+SYSTEMC_HOME ?= $(CATAPULT_HOME)/Mgc_home/shared/
+
+# Location of submodules
+CONNECTIONS_HOME ?= $(CATAPULT_HOME)/Mgc_home/shared/pkgs/matchlib_connections
+RAPIDJSON_HOME ?= $(CATAPULT_HOME)/Mgc_home/shared/
+MATCHLIB_HOME ?= $(CATAPULT_HOME)/Mgc_home/shared/pkgs/matchlib/cmod
 # 
 
 CC = g++
@@ -38,7 +39,7 @@ INCDIR += -I$(RAPIDJSON_HOME)/include
 INCDIR += -I$(MATCHLIB_HOME)/include 
 
 LIBDIR ?=
-LIBDIR += -L. -L$(SYSTEMC_HOME)/lib-linux64 -L$(BOOST_HOME)/lib
+LIBDIR += -L. -L$(SYSTEMC_HOME)/lib -L$(BOOST_HOME)/lib
 
 CFLAGS ?= 
 CFLAGS += -Wall -Wno-unknown-pragmas -Wno-virtual-move-assign -Wno-unused-local-typedefs -std=c++11 $(INCDIR) $(LIBDIR)
@@ -49,7 +50,7 @@ ifeq ($(HLS_CATAPULT),1)
 endif
 #
 LIBS ?=
-LIBS += -lstdc++ -lsystemc -lm -lpthread -lboost_timer -lboost_chrono -lboost_system
+LIBS += -lstdc++ -lm -lpthread -lboost_timer -lboost_chrono -lboost_system -lsystemc
 
 # SIM_MODE
 # 0 = Synthesis view of Connections port and combinational code.

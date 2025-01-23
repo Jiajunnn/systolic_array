@@ -1,0 +1,26 @@
+#%Module1.0
+
+#####################################################
+proc ModulesHelp { } { 
+  global version modroot
+
+  puts stderr "Sets the Environment for Catapult"
+}
+
+module-whatis   "Sets the environment for using Catapult (e.g. Catapult)"
+
+#module load tools/systemc/2.3.1
+#module load licenses/mentor-graphics
+#module load licenses/synopsys
+module load base/1.0
+module load catapult/2024.2_1
+module load questa/2021.4
+module load verdi/latest
+module load vcs/latest
+module load dc_shell/T-2022.03-SP4
+
+#prepend-path LD_LIBRARY_PATH /usr/lib64/:/cad/mentor/2023.1/Mgc_home/shared/lib 
+prepend-path LD_LIBRARY_PATH /sim/ttambe/hls_work/boost_out/boost/lib:/cad/mentor/2024.2_1/Mgc_home/shared/lib:/cad/synopsys/vcs_gnu_package/S-2021.09/gnu_9/linux 
+
+#setenv VG_GNU_PACKAGE /cad/synopsys/vcs_gnu_package/S-2021.09/gnu_9/linux
+#/cad/synopsys/vcs_gnu_package/S-2021.09/gnu_9/linux/source_me.csh

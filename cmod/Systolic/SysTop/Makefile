@@ -22,10 +22,14 @@ include ../../cmod_Makefile
 all: sim_test
 
 run:
-	./sim_test
+	./sim_test > output.log
 
-sim_test: $(wildcard *.h) $(wildcard *.cpp)
+# sim_test: $(wildcard *.h) $(wildcard *.cpp)
+# 	$(CC) -o sim_test $(CFLAGS) $(USER_FLAGS) $(wildcard *.cpp) $(BOOSTLIBS) $(LIBS)
+
+
+sim_test: $(wildcard *.h) testbench_gemm.cpp
 	$(CC) -o sim_test $(CFLAGS) $(USER_FLAGS) $(wildcard *.cpp) $(BOOSTLIBS) $(LIBS)
 
 sim_clean:
-	rm -rf *.o sim_*
+	rm -rf *.o sim_* *.log
