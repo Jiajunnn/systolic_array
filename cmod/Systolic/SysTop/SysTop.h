@@ -53,6 +53,7 @@ SC_MODULE(SysTop)
   Connections::Combinational<spec::InputType>  act_in_vec[N];
   Connections::Combinational<spec::InputType>  act_out_vec[N];
   Connections::Combinational<spec::InputType>  weight_in_vec[N];
+  Connections::Combinational<spec::InputType>  add_in_vec[N];
 
   // Memory Inteconnect
   Connections::Combinational<Memory::req_t>  mem_req[4];
@@ -119,6 +120,7 @@ SC_MODULE(SysTop)
       sa_inst.weight_in_vec[i](weight_in_vec[i]);
       sa_inst.act_out_vec[i](act_out_vec[i]);
       sa_inst.act_in_vec[i](act_in_vec[i]);
+      sa_inst.add_in_vec[i](add_in_vec[i]);
     }
 
     // Memory
@@ -163,6 +165,7 @@ SC_MODULE(SysTop)
     for (int i=0; i < N; i++) {
       is_inst.act_out_vec[i](act_out_vec[i]);
       is_inst.act_in_vec[i](act_in_vec[i]);
+      is_inst.add_in_vec[i](add_in_vec[i]);
     }
 
     // TODO: axi arbiter

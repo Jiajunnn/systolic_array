@@ -33,6 +33,7 @@ const static int   AccumMul   = 93;
 const static unsigned w_rd_base = 0x4000;
 const static unsigned d_rd_base = 0x8000;
 const static unsigned d_wr_base = 0xC000;
+const static unsigned add_rd_base = 0x10000;
 
 int ERROR = 0;
 
@@ -116,6 +117,11 @@ SC_MODULE (Master) {
     MasterAccess(0, 0x14, data_read);
     assert (data == data_read);
 
+    // data = add_rd_base;
+    // MasterAccess(1, 0x18, data);
+    // MasterAccess(0, 0x18, data_read);
+    // assert (data == data_read);
+
     cout << "@" << sc_time_stamp() << " Finish Axi Config[2-5] " << endl;
     
     // Start Master Input Read/Write test
@@ -165,6 +171,20 @@ SC_MODULE (Master) {
     while (interrupt.read() == 0) wait();
     cout << "@" << sc_time_stamp() << " Finish Weight Master Read " << endl;
     wait();
+
+
+
+    // add master read
+    // cout << "@" << sc_time_stamp() << " Start Add Master Read " << endl;
+    // data = 0x03;
+    // MasterAccess(1, 0x04, data);
+    // MasterAccess(0, 0x04, data_read);
+    // assert (data == data_read);
+    // // wait for IRQ
+    // while (interrupt.read() == 0) wait();
+    // cout << "@" << sc_time_stamp() << " Finish Add Master Read " << endl;
+    // wait();
+
    
     // start computation 
     cout << "@" << sc_time_stamp() << " Start Computation" << endl;
@@ -301,7 +321,7 @@ SC_MODULE (testbench) {
                 << "\t result=" << result 
                 << "\t | ref=" << ref << hex
                 << "\t | addr=" << addr << dec << endl;
-          // assert (result == ref);
+          assert (result == ref);
         }
         addr += 8;
       }
@@ -326,6 +346,7 @@ int sc_main(int argc, char *argv[])
   vector<vector<spec::InputType>> W_mat = GetMat<spec::InputType>(N, N); 
   vector<vector<spec::InputType>> I_mat = GetMat<spec::InputType>(N, M);  
   vector<vector<spec::InputType>> B_mat = GetMat<spec::InputType>(N, 1);
+  vector<vector<spec::InputType>> ADD_mat = GetMat<spec::InputType>(N, N);
   // Use B_mat as addition
   // vector<vector<spec::InputType>> B_mat = GetMat<spec::InputType>(N, N);
 
@@ -337,7 +358,7 @@ int sc_main(int argc, char *argv[])
   for (int j=0; j<M; j++) {    // for each column
     for (int i=0; i<N; i++) {  // for each element in column
       //cout << O_mat[i][j] << "\t";
-      spec::AccumType tmp = B_mat[i][j]; 
+      spec::AccumType tmp = B_mat[i][0]; 
       O_mat[i][j] = O_mat[i][j] + (tmp << BiasShift);
       //cout << O_mat[i][j] << "\t";
       if (IsRelu && O_mat[i][j] < 0) O_mat[i][j] = 0;
@@ -405,8 +426,30 @@ int sc_main(int argc, char *argv[])
   //     addr += 8;
   //   }   
   // }
+
+
+
   //original B_Mat
   int addr = w_rd_base;
+
+/// test some addition vectors
+
+
+    // NVUINT64 data = 1;
+    // my_testbench.slave.localMem[addr] = data;
+    // //cout << hex << "slave weight: " << data << endl; 
+    // addr += 8;
+    // data = 2;
+    // my_testbench.slave.localMem[addr] = data;
+    // addr += 8;
+    // data = 3;
+    // my_testbench.slave.localMem[addr] = data;
+    // addr += 8;
+    // data = 42;
+    // my_testbench.slave.localMem[addr] = data;
+    // addr += 8;
+
+
   for (int j = 0; j < N; j+=8) {
     NVUINT64 data = 0;
     for (int k = 0; k < 8; k++) {
@@ -441,13 +484,31 @@ int sc_main(int argc, char *argv[])
     for (int i = 0; i < N; i+=8) {  // each row
       NVUINT64 data = 0;
       for (int k = 0; k < 8; k++) {
-        data.set_slc<8>(k*8, I_mat[i+k][j]);
+        data.set_slc<8>(k*8, I_mat[i+k][j]); //each input is 8bits
+        //packed 8elements of 8 bits into a single 64bit data
       }
       my_testbench.slave.localMem[addr] = data;
       //cout << addr << "\t" << my_testbench.slave.localMem[addr] << endl;
       addr += 8;
     } 
   }   
+
+  //include the add matrix
+  // add00 add01 add02 add03
+  // add10 add11 add12 add13
+  addr = add_rd_base;
+  for (int i = 0; i < N; i++){
+    for (int j = 0; j < N; j+=8){
+      NVUINT64 data = 0;
+      for (int k = 0; k < 8; k++){
+        data.set_slc<8>(k*8, ADD_mat[i][j+k]);
+      }
+      my_testbench.slave.localMem[addr] = data;
+      addr += 8;
+      // cout << "add matrix: " << data << "at addr: " << addr <<endl;
+    }
+  }
+  
 
   cout << "SC_START" << endl;
   sc_start();
