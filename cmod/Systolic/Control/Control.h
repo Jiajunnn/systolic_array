@@ -18,6 +18,7 @@
 
 #include "../InputAxi/InputAxi.h"
 #include "../WeightAxi/WeightAxi.h"
+// #include "../AddAxi/AddAxi.h"
 #include "../Memory/Memory.h"
 
 #include "../include/SysSpec.h"
@@ -41,7 +42,8 @@ SC_MODULE(Control) {
   // --InputAxi Read (load), start 2  
   // --InputAxi Write (store), start 3
   // --InputSet (start computation), start 4
-  Connections::Out<NVUINT32> weight_axi_start;             
+  Connections::Out<NVUINT32> weight_axi_start;       
+  Connections::Out<NVUINT32> add_axi_start;      
   Connections::Out<InputAxi::MasterTrig> input_rd_axi_start;
   Connections::Out<InputAxi::MasterTrig> input_wr_axi_start;
   Connections::Out<Memory::IndexType>    com_start;
@@ -124,6 +126,7 @@ SC_MODULE(Control) {
     // Reset 
     sys_config.Reset();
     weight_axi_start.Reset();
+    add_axi_start.Reset();
     input_rd_axi_start.Reset();
     input_wr_axi_start.Reset();
     com_start.Reset();
@@ -198,6 +201,11 @@ SC_MODULE(Control) {
             com_start.Push(com_start_reg);
           }  
           break;
+          case 5: { // Add Master Read (Load from outside)
+            NVUINT32 base_addr = config_regs[7]; // base address of addition read
+            add_axi_start.Push(base_addr);
+          } 
+          break;    
           default: 
             break; // no IRQ, may lead to error
         }

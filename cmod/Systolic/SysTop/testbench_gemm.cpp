@@ -102,6 +102,7 @@ SC_MODULE (Master) {
     assert (data == data_read);
   
   
+    // Setting the base addresses
     data = w_rd_base;
     MasterAccess(1, 0x0C, data);
     MasterAccess(0, 0x0C, data_read);
@@ -115,6 +116,11 @@ SC_MODULE (Master) {
     data = d_wr_base;
     MasterAccess(1, 0x14, data);
     MasterAccess(0, 0x14, data_read);
+    assert (data == data_read);
+
+    data = add_rd_base;
+    MasterAccess(1, 0x1C, data);
+    MasterAccess(0, 0x1C, data_read);
     assert (data == data_read);
 
     // data = add_rd_base;
@@ -175,15 +181,15 @@ SC_MODULE (Master) {
 
 
     // add master read
-    // cout << "@" << sc_time_stamp() << " Start Add Master Read " << endl;
-    // data = 0x03;
-    // MasterAccess(1, 0x04, data);
-    // MasterAccess(0, 0x04, data_read);
-    // assert (data == data_read);
-    // // wait for IRQ
-    // while (interrupt.read() == 0) wait();
-    // cout << "@" << sc_time_stamp() << " Finish Add Master Read " << endl;
-    // wait();
+    cout << "@" << sc_time_stamp() << " Start Add Master Read " << endl;
+    data = 0x05;
+    MasterAccess(1, 0x04, data);
+    MasterAccess(0, 0x04, data_read);
+    assert (data == data_read);
+    // wait for IRQ
+    while (interrupt.read() == 0) wait();
+    cout << "@" << sc_time_stamp() << " Finish Add Master Read " << endl;
+    wait();
 
    
     // start computation 
@@ -337,6 +343,7 @@ SC_MODULE (testbench) {
 int sc_main(int argc, char *argv[])
 {
   //nvhls::set_random_seed();
+  //print argc and argv, check them
 
 
   // Weight N*N 

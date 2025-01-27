@@ -42,7 +42,7 @@ LIBDIR ?=
 LIBDIR += -L. -L$(SYSTEMC_HOME)/lib -L$(BOOST_HOME)/lib
 
 CFLAGS ?= 
-CFLAGS += -Wall -Wno-unknown-pragmas -Wno-virtual-move-assign -Wno-unused-local-typedefs -std=c++11 $(INCDIR) $(LIBDIR)
+CFLAGS += -g -Wall -Wno-unknown-pragmas -Wno-virtual-move-assign -Wno-unused-local-typedefs -std=c++11 $(INCDIR) $(LIBDIR)
 
 HLS_CATAPULT ?= 1
 ifeq ($(HLS_CATAPULT),1)
