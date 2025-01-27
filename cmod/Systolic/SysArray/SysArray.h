@@ -34,6 +34,7 @@ SC_MODULE(SysArray)
   // FIXME: another weight input module to reduce input channels
   Connections::In<spec::InputType>   weight_in_vec[N];
   Connections::In<spec::InputType>   act_in_vec[N];
+  Connections::In<spec::InputType>   add_in_vec[N];
   Connections::Out<spec::InputType>  act_out_vec[N];
   //Connections::Out<spec::AccumType>  accum_out_vec[N];
 
@@ -48,6 +49,9 @@ SC_MODULE(SysArray)
   Connections::Combinational<spec::InputType> weight_inter[N][N];
   
   Connections::Combinational<spec::InputType> act_inter[N][N]; 
+
+  Connections::Combinational<spec::InputType> act_addition[N]; 
+  
   
   Connections::Combinational<spec::AccumType> accum_inter[N][N];
   
@@ -57,7 +61,10 @@ SC_MODULE(SysArray)
   // --8-bit
   //spec::InputType bias_vec[N];
 
+  
+
   SC_HAS_PROCESS(SysArray);
+  // act_addition = act_in_vec;
   SysArray(sc_module_name name_) : sc_module(name_) {
     for (int i = 0; i < N; i++) {    // rows
       for (int j = 0; j < N; j++) {  // cols
@@ -93,6 +100,7 @@ SC_MODULE(SysArray)
           pe_array[i][j]->accum_out(accum_out_vec[j]);
         }
       }
+      // act_addition[i] = act_in_vec[i];
       bias_vec[i] = new SysBias(sc_gen_unique_name("bias"));
       bias_vec[i]->clk(clk);
       bias_vec[i]->rst(rst);
@@ -100,6 +108,7 @@ SC_MODULE(SysArray)
       bias_vec[i]->weight_in(weight_inter[N-1][i]);
       bias_vec[i]->accum_out(accum_out_vec[i]);
       bias_vec[i]->act_out(act_out_vec[i]);
+      bias_vec[i]->add_in(add_in_vec[i]);
     }
  
 //    SC_THREAD (WeightAccumOutRun);
@@ -141,7 +150,13 @@ SC_MODULE(SysArray)
         for (int i = 0; i < N; i++) {      
           sys_config_out[i].Push(sys_config_reg);
         }
-      }     
+      }  
+      // set add in to be the same as act in
+      // #pragma hls_unroll yes
+      // for (int i = 0; i < N; i++) {
+      //   act_addition[i].Push(act_in_vec[i].Read());
+      //   cout << "act_addition in sysarray" << act_addition[i].Read() << endl;
+      // }   
       wait();
     }
   }

@@ -24,6 +24,7 @@
 * ----data=2 -> master input read
 * ----data=3 -> master input write
 * ----data=4 -> start systolic array
+* ----data=5 -> master addition read
 * 2--0x08: computation config
 * ----data[00-07]= "M-1" (8-bit, M: 1~256)
 * ----data[08-15]= use relu (1 bit)
@@ -34,4 +35,4 @@
 * 4--0x10: input_read_base address
 * 5--0x14: input_write_base address
 * 6--0x18: flip memory buffer (no IRQ, write only)
-* 7--0x1C: dummy
+* 7--0x1C: addition_read_base address

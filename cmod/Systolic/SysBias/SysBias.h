@@ -23,11 +23,12 @@ SC_MODULE(SysBias)
   NVUINT8 accum_multiplier;
  
   spec::InputType bias;
+  spec::InputType act_addition;
  
   Connections::In<spec::SysConfig>   sys_config;
   Connections::In<spec::InputType>   weight_in;
   Connections::In<spec::AccumType>   accum_out;
-  Connections::In<spec::InputType>   act_in_vec[N];
+  Connections::In<spec::InputType>   add_in;
   Connections::Out<spec::InputType>  act_out;
 
   SC_HAS_PROCESS(SysBias);
@@ -49,6 +50,7 @@ SC_MODULE(SysBias)
     weight_in.Reset();
     accum_out.Reset();
     act_out.Reset();
+    // act_addition.Reset();
     
     is_relu = 0;
     bias_left_shift = 0;
@@ -56,26 +58,29 @@ SC_MODULE(SysBias)
     accum_multiplier = 1;
     
     bias = 0;
+    // act_addition = 0; 
     
     #pragma hls_pipeline_init_interval 1
     while(1) {
 	    spec::AccumType accum_tmp;
       spec::SysConfig sys_config_tmp;
       spec::InputType weight_tmp;
-      
+      spec::InputType act_addition_tmp;
+
       if (sys_config.PopNB(sys_config_tmp)) {
         is_relu = sys_config_tmp.is_relu;
         bias_left_shift = sys_config_tmp.bias_left_shift;
         accum_right_shift = sys_config_tmp.accum_right_shift;
         accum_multiplier = sys_config_tmp.accum_multiplier;
-        //cout << "Receive axi systolic array config" << endl;
-        //cout << "is_relu: " << is_relu << "\tbias_l: " << bias_left_shift
+        cout << "Timestamp" << sc_time_stamp() << " Receive axi systolic array config" << endl;
+        // cout << "is_relu: " << is_relu << "\tbias_l: " << bias_left_shift 
         //     << "\taccum_r: " << accum_right_shift
         //     << "\taccum_ml: " << accum_multiplier
         //     << endl;
       }
       else if (accum_out.PopNB(accum_tmp)) {
 	      spec::AccumType bias_tmp = bias;
+        cout << "Timestamp " << sc_time_stamp() << " Bias Value: " << bias << endl;
 	      bias_tmp = bias_tmp << bias_left_shift;
         accum_tmp = accum_tmp + bias_tmp;      
         if ((is_relu==1) && (accum_tmp < 0)) accum_tmp = 0;
@@ -91,10 +96,16 @@ SC_MODULE(SysBias)
         spec::InputType act_out_reg = accum_mul;
         // Push output
         act_out.Push(act_out_reg);
+        cout << "Timestamp " << sc_time_stamp() << " Output: " << act_out_reg << endl;
       }
       else if(weight_in.PopNB(weight_tmp)){
         bias = weight_tmp;
+        // cout <<"Timestamp " << sc_time_stamp() <<" Receive bias: " << bias << endl;
 	    }
+      else if(weight_in.PopNB(act_addition_tmp)){
+        act_addition = act_addition_tmp;
+        cout <<"Timestamp " << sc_time_stamp() <<" Receive addition: " << act_addition << endl;
+    }
       wait();
 	  }
   }

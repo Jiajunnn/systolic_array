@@ -31,6 +31,7 @@ SC_MODULE(InputSetup)
   
   Connections::In<InputType>      act_out_vec[N];  // from SysArray
   Connections::Out<InputType>     act_in_vec[N];   // to SysArray
+  Connections::Out<InputType>     add_in_vec[N];   // to SysArray
 
   // Memory channels
   Connections::Out<Memory::req_t>   rd_req; 
@@ -130,6 +131,7 @@ SC_MODULE(InputSetup)
     #pragma hls_unroll yes
     for (int i = 0; i < N; i++) {
       act_in_vec[i].Reset();
+      add_in_vec[i].Reset();
     }
     rd_rsp.Reset();
 
@@ -139,10 +141,30 @@ SC_MODULE(InputSetup)
       if (rd_rsp.PopNB(rsp_reg)) {
         #pragma hls_unroll yes
         for (int i = 0; i < N; i++) {
-          if (rsp_reg.valids[i] == true)
+          if (rsp_reg.valids[i] == true) {
+            cout << "CHECK DATA ACT IN@" << sc_time_stamp() << "\t" << rsp_reg.data[i] << endl;
             act_in_vec[i].Push(rsp_reg.data[i]);
+            // wait();
+    
+            // add_in_vec[i].Push(0);
+
+            cout << "CHECK DATA ADD IN @" << sc_time_stamp() << "\t" << rsp_reg.data[i] << endl;
+            // assert (act_in_vec[i] == add_in_vec[i]);
+          }
         }
+        // #pragma hls_unroll yes
+        // for (int i = 0; i < N; i++) {
+        //   if (rsp_reg.valids[i] == true) {
+        //     add_in_vec[i].Push(0);
+        //     cout << "CHECK DATA ADD IN @" << sc_time_stamp() << "\t" << rsp_reg.data[i] << endl;
+        //   }
+        // }
       }
+      //copy data to add_in_vec
+      // #pragma hls_unroll yes
+      // for (int i = 0; i < N; i++) {
+      //   add_in_vec[i].Push(0);
+      // }
       wait();
     }
   }

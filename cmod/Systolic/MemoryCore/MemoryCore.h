@@ -134,9 +134,9 @@ SC_MODULE(MemoryCore)
           rsp_inter.Push(rsp_reg);
           for (int i = 0; i < N; i++){
             if (req_reg.valids[i]){
-              int bank_sel = nvhls::get_slc<log2_nbanks>(req_reg.addr[i], 0);
-              int addr_sel = nvhls::get_slc<addr_width - log2_nbanks>(req_reg.addr[i], log2_nbanks);
-              cout << "Gainsight Read at Bank " << bank_sel << " at address " << addr_sel << " at time stamp: " << sc_time_stamp() << " with data " << rsp_reg.data[i] << endl;
+              // int bank_sel = nvhls::get_slc<log2_nbanks>(req_reg.addr[i], 0);
+              // int addr_sel = nvhls::get_slc<addr_width - log2_nbanks>(req_reg.addr[i], log2_nbanks);
+              // cout << "Gainsight Read at Bank " << bank_sel << " at address " << addr_sel << " at time stamp: " << sc_time_stamp() << " with data " << rsp_reg.data[i] << endl;
               // printf("Bank and input sizes are both %d\n",N);
               // cout <<"Bank and input sizes: "<< N << endl;
             }
@@ -145,9 +145,9 @@ SC_MODULE(MemoryCore)
         if (is_write) {
           for (int i = 0; i < N; i++){
             if (req_reg.valids[i]){
-              int bank_sel = nvhls::get_slc<log2_nbanks>(req_reg.addr[i], 0);
-              int addr_sel = nvhls::get_slc<addr_width - log2_nbanks>(req_reg.addr[i], log2_nbanks);
-              cout << "Gainsight Write at Bank " << bank_sel << " at address "  << addr_sel << " at time stamp: " << sc_time_stamp() << " with data " << req_reg.data[i] << endl;
+              // int bank_sel = nvhls::get_slc<log2_nbanks>(req_reg.addr[i], 0);
+              // int addr_sel = nvhls::get_slc<addr_width - log2_nbanks>(req_reg.addr[i], log2_nbanks);
+              // cout << "Gainsight Write at Bank " << bank_sel << " at address "  << addr_sel << " at time stamp: " << sc_time_stamp() << " with data " << req_reg.data[i] << endl;
             }
           }  
         }
