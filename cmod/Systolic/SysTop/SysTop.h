@@ -14,6 +14,8 @@
 #include "../Control/Control.h"
 #include "../WeightAxi/WeightAxi.h"
 #include "../InputAxi/InputAxi.h"
+#include "../AddAxi/AddAxi.h"
+
 
 SC_MODULE(SysTop)
 {
@@ -39,6 +41,10 @@ SC_MODULE(SysTop)
   // Axi Master Weight
   typename spec::AxiData::axi4_data::read::template chan<>   if_weight_rd;
   typename spec::AxiData::axi4_data::write::template chan<>  if_weight_wr;
+
+  //   // Axi Master Add
+  typename spec::AxiData::axi4_data::read::template chan<>   if_add_rd;
+  typename spec::AxiData::axi4_data::write::template chan<>  if_add_wr;
 
   // Axi Master Input
   typename spec::AxiData::axi4_data::read::template chan<>   if_input_rd;
@@ -66,9 +72,10 @@ SC_MODULE(SysTop)
   Connections::Combinational<NVUINT32> weight_axi_start;
   Connections::Combinational<InputAxi::MasterTrig> input_rd_axi_start;
   Connections::Combinational<InputAxi::MasterTrig> input_wr_axi_start;
+  Connections::Combinational<NVUINT32> add_axi_start;
   Connections::Combinational<Memory::IndexType>    com_start;
   // Control IRQ
-  Connections::Combinational<bool> IRQs[4];
+  Connections::Combinational<bool> IRQs[5];
 
   SysArray    sa_inst; 
   InputSetup  is_inst;
@@ -76,6 +83,7 @@ SC_MODULE(SysTop)
   WeightAxi   wa_inst;
   InputAxi    ia_inst;
   Memory      mm_inst;
+  AddAxi      aa_inst;
   // TODO, need an AXI arbiter for 2 Masters
   spec::AxiData::ArbiterData axi_arbiter;
   
@@ -87,6 +95,8 @@ SC_MODULE(SysTop)
     if_data_wr("if_data_wr"),
     if_weight_rd("if_weight_rd"),
     if_weight_wr("if_weight_wr"),
+    if_add_rd("if_add_rd"),
+    if_add_wr("if_add_wr"),
     if_input_rd("if_input_rd"),
     if_input_wr("if_input_wr"),
     sa_inst("sa_inst"),
@@ -95,6 +105,7 @@ SC_MODULE(SysTop)
     wa_inst("wa_inst"),
     ia_inst("ia_inst"),
     mm_inst("mm_inst"),
+    aa_inst("aa_inst"),
     axi_arbiter("axi_arbiter")
   {
     // Control unit 
@@ -105,11 +116,12 @@ SC_MODULE(SysTop)
     ct_inst.if_axi_wr(if_axi_wr); // axi slave
     ct_inst.sys_config(sys_config);                 // Config
     ct_inst.weight_axi_start(weight_axi_start);     // weight master read
+    ct_inst.add_axi_start(add_axi_start);           // add master read
     ct_inst.input_rd_axi_start(input_rd_axi_start); // input master read
     ct_inst.input_wr_axi_start(input_wr_axi_start); // input master write
     ct_inst.com_start(com_start);     // compute startg 
     ct_inst.flip_mem(flip_mem);       // flip mem
-    for (int i = 0; i < 4; i++)       // irq in
+    for (int i = 0; i < 5; i++)       // irq in
       ct_inst.IRQs[i](IRQs[i]);
 
     // Systolic array
@@ -141,6 +153,18 @@ SC_MODULE(SysTop)
       wa_inst.weight_in_vec[i](weight_in_vec[i]);
     }
 
+    // Add Axi Master IRQs[4]
+    aa_inst.clk(clk);
+    aa_inst.rst(rst);
+    aa_inst.start(add_axi_start);
+    aa_inst.rd_IRQ(IRQs[4]);
+    aa_inst.if_data_rd(if_add_rd);
+    aa_inst.if_data_wr(if_add_wr);
+    for (int i=0; i < N; i++) {
+      aa_inst.add_in_vec[i](add_in_vec[i]);
+    }
+
+
     // Input Axi Master  read: IRQs[1] write: IRQs[2]
     ia_inst.clk(clk);
     ia_inst.rst(rst); 
@@ -165,7 +189,7 @@ SC_MODULE(SysTop)
     for (int i=0; i < N; i++) {
       is_inst.act_out_vec[i](act_out_vec[i]);
       is_inst.act_in_vec[i](act_in_vec[i]);
-      is_inst.add_in_vec[i](add_in_vec[i]);
+      // is_inst.add_in_vec[i](add_in_vec[i]);
     }
 
     // TODO: axi arbiter
@@ -184,6 +208,12 @@ SC_MODULE(SysTop)
     axi_arbiter.axi_wr_m_aw[1](if_input_wr.aw);
     axi_arbiter.axi_wr_m_w [1](if_input_wr.w);
     axi_arbiter.axi_wr_m_b [1](if_input_wr.b);
+
+    axi_arbiter.axi_rd_m_ar[2](if_add_rd.ar);
+    axi_arbiter.axi_rd_m_r [2](if_add_rd.r);
+    axi_arbiter.axi_wr_m_aw[2](if_add_wr.aw);
+    axi_arbiter.axi_wr_m_w [2](if_add_wr.w);
+    axi_arbiter.axi_wr_m_b [2](if_add_wr.b);
 
     axi_arbiter.axi_rd_s(if_data_rd);
     axi_arbiter.axi_wr_s(if_data_wr);

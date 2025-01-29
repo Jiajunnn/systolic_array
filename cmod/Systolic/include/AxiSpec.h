@@ -37,7 +37,7 @@ namespace spec {
     typedef typename axi::axi4<axiCfg> axi4_data;
 
     // AxiArbiter template <typename axiCfg, int numMasters, int maxOutstandingRequests>
-    typedef AxiArbiter<axiCfg, 2, 1> ArbiterData;
+    typedef AxiArbiter<axiCfg, 3, 1> ArbiterData;
   }
   
   // FIXME: 

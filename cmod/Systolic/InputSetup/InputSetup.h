@@ -31,7 +31,7 @@ SC_MODULE(InputSetup)
   
   Connections::In<InputType>      act_out_vec[N];  // from SysArray
   Connections::Out<InputType>     act_in_vec[N];   // to SysArray
-  Connections::Out<InputType>     add_in_vec[N];   // to SysArray
+  // Connections::Out<InputType>     add_in_vec[N];   // to SysArray
 
   // Memory channels
   Connections::Out<Memory::req_t>   rd_req; 
@@ -131,7 +131,7 @@ SC_MODULE(InputSetup)
     #pragma hls_unroll yes
     for (int i = 0; i < N; i++) {
       act_in_vec[i].Reset();
-      add_in_vec[i].Reset();
+      // add_in_vec[i].Reset();
     }
     rd_rsp.Reset();
 

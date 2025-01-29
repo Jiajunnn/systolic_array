@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 
-CFLAGS = -DHLS_ALGORITHMICC 
+CFLAGS = -DHLS_ALGORITHMICC -g
 
 include ../../cmod_Makefile
 
