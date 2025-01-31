@@ -75,7 +75,7 @@ SC_MODULE(SysTop)
   Connections::Combinational<Memory::IndexType>    com_start;
   
   // Control IRQ
-  Connections::Combinational<bool> IRQs[4];
+  Connections::Combinational<bool> IRQs[5];
 
   SysArray    sa_inst; 
   InputSetup  is_inst;
@@ -121,7 +121,7 @@ SC_MODULE(SysTop)
     ct_inst.input_wr_axi_start(input_wr_axi_start); // input master write
     ct_inst.com_start(com_start);     // compute startg 
     ct_inst.flip_mem(flip_mem);       // flip mem
-    for (int i = 0; i < 4; i++)       // irq in
+    for (int i = 0; i < 5; i++)       // irq in
       ct_inst.IRQs[i](IRQs[i]);
 
     // Systolic array

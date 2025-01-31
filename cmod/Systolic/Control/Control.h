@@ -51,7 +51,7 @@ SC_MODULE(Control) {
   Connections::Out<bool> flip_mem;
 
   // Input: IRQs (= #triggers)
-  Connections::In<bool> IRQs[4]; 
+  Connections::In<bool> IRQs[5]; 
 
   // AXI rv channels
   Connections::Combinational<spec::AxiConf::SlaveToRV::Write> rv_in;
@@ -228,7 +228,7 @@ SC_MODULE(Control) {
   // IRQ[3]: computation
   void InterruptRun() {
     #pragma hls_unroll yes 
-    for (unsigned i = 0; i < 4; i++) {
+    for (unsigned i = 0; i < 5; i++) {
       IRQs[i].Reset();
     }
     // Reset IRO
@@ -237,7 +237,7 @@ SC_MODULE(Control) {
     while(1) {
       NVUINTW(4) irq_valids = 0;
       #pragma hls_unroll yes
-      for (int i = 0; i < 4; i++) {
+      for (int i = 0; i < 5; i++) {
         bool tmp;
         irq_valids[i] = IRQs[i].PopNB(tmp);
       }
