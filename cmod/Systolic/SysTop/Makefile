@@ -28,7 +28,7 @@ run:
 # 	$(CC) -o sim_test $(CFLAGS) $(USER_FLAGS) $(wildcard *.cpp) $(BOOSTLIBS) $(LIBS)
 
 
-sim_test: $(wildcard *.h) testbench_gemm.cpp
+sim_test: $(wildcard *.h) testbench_dotprod.cpp
 	$(CC) -o sim_test $(CFLAGS) $(USER_FLAGS) $(wildcard *.cpp) $(BOOSTLIBS) $(LIBS)
 
 sim_clean:

@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 
 data = pd.read_csv('lifetimes_bank_addr.csv')
 
-bin_size = 50
+bin_size = 10
 max_lifetime = data['Lifetime'].max()
 bins = range(0, max_lifetime + bin_size, bin_size)
 
@@ -18,7 +18,7 @@ for bank, ax in zip(data['Bank'].unique(), axes.flatten()):
     ax.set_xlabel(f'Lifetime (Grouped by {bin_size}ns)')
     ax.set_ylabel('Frequency')
 
-output_file = 'histograms.png'
+output_file = 'histograms_n32.png'
 plt.savefig(output_file)
 plt.close()
 
