@@ -364,9 +364,9 @@ int sc_main(int argc, char *argv[])
   // Input N*M
   // Output N*M
   
-  vector<vector<spec::InputType>> W_mat = GetMat<spec::InputType>(32, 32); 
-  vector<vector<spec::InputType>> I_mat = GetMat<spec::InputType>(32, 32);  
-  vector<vector<spec::InputType>> B_mat = GetMat<spec::InputType>(32, 1);
+  vector<vector<spec::InputType>> W_mat = GetMat<spec::InputType>(N, N); 
+  vector<vector<spec::InputType>> I_mat = GetMat<spec::InputType>(N, M);  
+  vector<vector<spec::InputType>> B_mat = GetMat<spec::InputType>(N, 1);
 
   vector<vector<spec::AccumType>> O_mat;
   O_mat = MatMul<spec::InputType, spec::AccumType>(W_mat, I_mat); 
